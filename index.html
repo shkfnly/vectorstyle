@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Vector Styles</title>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.8.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+      body { margin: 0, padding: 0; }
+      #map { position:absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+  </head>
+  <body>
+    <style>
+#features {
+      position:absolute;
+            top:0;
+                  right:0;
+                        bottom:0;
+                              width:300px;
+                                    overflow:auto;
+                                          background:rgba(255, 255, 255, 0.8);
+}
+    </style>
+    <div id="map"></div>
+    <pre id='features'></pre>
+    <script>
+      
+      mapboxgl.accessToken = 'pk.eyJ1IjoidXJiaW5zaWdodCIsImEiOiJIbG1xUDBBIn0.o2RgJkl1-wCO7yyG7Khlzg'
+      var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'outdoors-v7.json',
+        center: [47.4333, 19.2500],
+        zoom: 9
+      });
+      map.on('style.load', function() {
+        map.addSource("parcels", {
+          "type": "geojson",
+          "data": "data/combined.geojson"
+          }
+        );
+        
+        map.addLayer({
+          "id": "parcels",
+          "type": "fill",
+          "source": "parcels",
+          "interactive": true,
+          "paint": {
+            "fill-color": '#000000'
+          },
+          "paint.testing": {
+            "fill-color": '#FF00FF'
+          }
+        }); 
+         
+        map.addLayer({
+          "id": "parcels2",
+          "type": "fill",
+          "source": "parcels",
+          "filter": ["==", "properties.tags.building", "yes"],
+          "interactive": true,
+          "paint": {
+            "fill-color": '#0000FF'
+          },
+          "paint.testing": {
+            "fill-color": '#FF00FF'
+          }
+        }); 
+      });
+      map.on('mousemove', function(e) {
+        map.featuresAt(e.point, {radius: 5, layer: 'parcels'}, function(err, features) {
+          console.log('getting called');
+          document.getElementById('features').innerHTML = JSON.stringify(features, null, 2);
+        });
+      });
+    </script>
+  </body>
+</html>
